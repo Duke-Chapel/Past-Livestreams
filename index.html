@@ -13,7 +13,7 @@
 
     iframe {
       width: 100%;
-      aspect-ratio: 16/9;
+      aspect-ratio: 16 / 9;
     }
   </style>
 </head>
@@ -22,17 +22,39 @@
 
   <script>
     // Replace with your Cloud Function URL
-    fetch('https://us-east1-embed-youtube-livestream-app.cloudfunctions.net/fetchPastLiveStreams')
-      .then(response => response.json())
-      .then(data => {
-        const videoContainer = document.getElementById('videos');
-        data.forEach(video => {
-          const iframe = document.createElement('iframe');
-          iframe.src = `https://www.youtube.com/embed/${video.id.videoId}`;
-          videoContainer.appendChild(iframe);
-        });
+    const apiUrl = 'https://us-east1-embed-youtube-livestream-app.cloudfunctions.net/fetchPastLiveStreams';
+
+    // Function to fetch past live streams and display them
+    function fetchAndDisplayVideos() {
+      fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors', // Enable cross-origin requests
       })
-      .catch(error => console.error('Error fetching videos:', error));
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const videoContainer = document.getElementById('videos');
+          videoContainer.innerHTML = ''; // Clear previous content
+
+          data.forEach(video => {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${video.id.videoId}`;
+            iframe.allowFullscreen = true; // Allow fullscreen for videos
+            videoContainer.appendChild(iframe);
+          });
+        })
+        .catch(error => console.error('Error fetching videos:', error));
+    }
+
+    // Call the function when the page loads
+    window.onload = fetchAndDisplayVideos;
   </script>
 </body>
 </html>
