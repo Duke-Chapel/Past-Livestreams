@@ -4,76 +4,107 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    #large-video iframe {
-      width: 100%;
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    #large-video {
+      width: 80%;
       aspect-ratio: 16 / 9;
       margin-bottom: 20px;
+      border: 2px solid #333;
     }
 
-    #small-videos {
+    #video-thumbnails {
       display: flex;
-      gap: 10px;
       overflow-x: auto;
+      gap: 10px;
+      width: 80%;
+      padding-bottom: 10px;
     }
 
-    #small-videos iframe {
-      flex: 0 0 200px;
-      aspect-ratio: 16 / 9;
+    .thumbnail {
+      flex: 0 0 150px;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s ease;
     }
 
-    #small-videos iframe:hover {
-      transform: scale(1.05); /* Slight zoom effect on hover */
+    .thumbnail:hover {
+      transform: scale(1.05);
+    }
+
+    iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
     }
   </style>
 </head>
 <body>
-  <div id="large-video">
-    <iframe allowfullscreen></iframe>
-  </div>
+  <!-- Large video container -->
+  <iframe id="large-video" allowfullscreen></iframe>
 
-  <div id="small-videos"></div>
+  <!-- Thumbnails container -->
+  <div id="video-thumbnails"></div>
 
   <script>
+    // Replace with your Cloud Function URL
     const apiUrl = 'https://us-east1-embed-youtube-livestream-app.cloudfunctions.net/fetchPastLiveStreams';
 
     // Function to fetch and display videos
-    function fetchAndDisplayVideos() {
-      fetch(apiUrl, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'cors',
-      })
-        .then(response => {
-          if (!response.ok) throw new Error('Network response was not ok');
-          return response.json();
-        })
-        .then(data => {
-          const largeVideoIframe = document.querySelector('#large-video iframe');
-          const smallVideosContainer = document.getElementById('small-videos');
+    async function fetchAndDisplayVideos() {
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          mode: 'cors'
+        });
 
-          // Set the first video (most recent) as the large video
-          largeVideoIframe.src = `https://www.youtube.com/embed/${data[0].id}`;
+        if (!response.ok) throw new Error('Network response was not ok');
 
-          // Create iframes for the smaller videos
-          data.slice(1).forEach(video => {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${video.id}`;
-            iframe.allowFullscreen = true;
-
-            // Update the large video when a small video is clicked
-            iframe.addEventListener('click', () => {
-              largeVideoIframe.src = `https://www.youtube.com/embed/${video.id}`;
-            });
-
-            smallVideosContainer.appendChild(iframe);
-          });
-        })
-        .catch(error => console.error('Error fetching videos:', error));
+        const data = await response.json();
+        displayVideos(data);
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+      }
     }
 
-    // Fetch videos on page load
+    // Function to display videos in the large container and as thumbnails
+    function displayVideos(videos) {
+      const largeVideo = document.getElementById('large-video');
+      const thumbnailsContainer = document.getElementById('video-thumbnails');
+
+      // Display the most recent video in the large container by default
+      largeVideo.src = `https://www.youtube.com/embed/${videos[0].id}`;
+
+      // Populate the thumbnails section
+      videos.slice(1).forEach(video => {
+        const thumbnail = document.createElement('div');
+        thumbnail.classList.add('thumbnail');
+
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${video.id}`;
+        iframe.allowFullscreen = true;
+
+        // Add click event to swap the large video with the clicked one
+        thumbnail.onclick = () => swapVideo(largeVideo, video.id);
+
+        thumbnail.appendChild(iframe);
+        thumbnailsContainer.appendChild(thumbnail);
+      });
+    }
+
+    // Function to swap the large video with the selected thumbnail video
+    function swapVideo(largeVideo, videoId) {
+      largeVideo.src = `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    // Fetch videos when the page loads
     window.onload = fetchAndDisplayVideos;
   </script>
 </body>
