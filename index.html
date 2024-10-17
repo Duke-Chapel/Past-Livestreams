@@ -11,6 +11,7 @@
       justify-content: space-between; /* Space between large video and thumbnails */
       align-items: flex-start; /* Align items to the top */
       margin: 0 auto; /* Center the container */
+      max-width: 1200px; /* Set a max width for larger screens */
     }
 
     /* Styling for the main video display */
@@ -18,6 +19,7 @@
       width: 100%; /* Full width of available space */
       margin-right: 10px;
       aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+      height: auto; /* Allow height to adjust */
     }
 
     /* Styling for the thumbnails container */
@@ -26,8 +28,7 @@
       flex-direction: column; /* Stack thumbnails vertically */
       overflow-y: auto; /* Allow vertical scrolling */
       gap: 10px; /* Space between thumbnails */
-      max-height: auto;
-      width: 500px; /* Fixed width for thumbnails container */
+      width: 200px; /* Fixed width for thumbnails container */
     }
 
     .thumbnail {
@@ -122,12 +123,28 @@
           thumbnail.style.border = '2px solid blue';
         }
       });
+
+      // Set the max height of thumbnails container to match the large video
+      adjustThumbnailsHeight();
     }
 
     // Function to set the large video
     function setLargeVideo(videoId) {
       const largeVideo = document.getElementById('large-video');
       largeVideo.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      
+      // Adjust the height of the thumbnails to match the large video
+      adjustThumbnailsHeight();
+    }
+
+    // Function to adjust the height of the thumbnails container
+    function adjustThumbnailsHeight() {
+      const largeVideo = document.getElementById('large-video');
+      const thumbnailsContainer = document.getElementById('video-thumbnails');
+      const videoHeight = largeVideo.clientHeight; // Get the height of the large video
+
+      // Set the max height of the thumbnails container to the height of the large video
+      thumbnailsContainer.style.maxHeight = `${videoHeight}px`;
     }
 
     // Fetch and display videos when the page loads
