@@ -7,6 +7,7 @@
     #large-video iframe {
       width: 100%;
       aspect-ratio: 16 / 9;
+      margin-bottom: 20px;
     }
 
     #small-videos {
@@ -19,6 +20,11 @@
       flex: 0 0 200px;
       aspect-ratio: 16 / 9;
       cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    #small-videos iframe:hover {
+      transform: scale(1.05); /* Slight zoom effect on hover */
     }
   </style>
 </head>
@@ -32,6 +38,7 @@
   <script>
     const apiUrl = 'https://us-east1-embed-youtube-livestream-app.cloudfunctions.net/fetchPastLiveStreams';
 
+    // Function to fetch and display videos
     function fetchAndDisplayVideos() {
       fetch(apiUrl, {
         method: 'GET',
@@ -46,7 +53,7 @@
           const largeVideoIframe = document.querySelector('#large-video iframe');
           const smallVideosContainer = document.getElementById('small-videos');
 
-          // Set the first video as the large video
+          // Set the first video (most recent) as the large video
           largeVideoIframe.src = `https://www.youtube.com/embed/${data[0].id}`;
 
           // Create iframes for the smaller videos
@@ -55,10 +62,10 @@
             iframe.src = `https://www.youtube.com/embed/${video.id}`;
             iframe.allowFullscreen = true;
 
-            // Swap large video when a small video is clicked
-            iframe.onclick = () => {
+            // Update the large video when a small video is clicked
+            iframe.addEventListener('click', () => {
               largeVideoIframe.src = `https://www.youtube.com/embed/${video.id}`;
-            };
+            });
 
             smallVideosContainer.appendChild(iframe);
           });
@@ -66,6 +73,7 @@
         .catch(error => console.error('Error fetching videos:', error));
     }
 
+    // Fetch videos on page load
     window.onload = fetchAndDisplayVideos;
   </script>
 </body>
