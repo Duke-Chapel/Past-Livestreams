@@ -18,6 +18,7 @@
       aspect-ratio: 16 / 9;
       margin-bottom: 20px;
       border: 2px solid #333;
+      border-radius: 8px;
     }
 
     #video-thumbnails {
@@ -29,7 +30,7 @@
     }
 
     .thumbnail {
-      flex: 0 0 200px;  /* Minimum width for each thumbnail */
+      flex: 0 0 200px;
       cursor: pointer;
       transition: transform 0.2s ease;
     }
@@ -62,7 +63,7 @@
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          mode: 'cors'
+          mode: 'cors',
         });
 
         if (!response.ok) throw new Error('Network response was not ok');
@@ -79,25 +80,30 @@
       const largeVideo = document.getElementById('large-video');
       const thumbnailsContainer = document.getElementById('video-thumbnails');
 
-      // Display the most recent video in the large container by default
-      largeVideo.src = `https://www.youtube.com/embed/${videos[0].id}`;
+      if (videos.length === 0) {
+        console.error('No videos found.');
+        return;
+      }
 
-      // Create thumbnails for all other videos
-      videos.slice(1).forEach(video => {
+      // Display the most recent video in the large container by default
+      largeVideo.src = `https://www.youtube.com/embed/${videos[0].id.videoId}`;
+
+      // Create thumbnails for the remaining videos
+      videos.slice(1).forEach((video) => {
         const thumbnail = document.createElement('div');
         thumbnail.classList.add('thumbnail');
-        thumbnail.dataset.videoId = video.id;  // Store video ID in the dataset
+        thumbnail.dataset.videoId = video.id.videoId;  // Store video ID in dataset
 
         const img = document.createElement('img');
-        img.src = video.snippet.thumbnails.medium.url;  // Use video thumbnail image
+        img.src = video.snippet.thumbnails.medium.url;  // Use thumbnail image
         img.alt = video.snippet.title;
 
         thumbnail.appendChild(img);
         thumbnailsContainer.appendChild(thumbnail);
 
-        // Add click event to swap videos
+        // Add click event listener to swap videos
         thumbnail.addEventListener('click', () => {
-          swapVideo(largeVideo, video.id);
+          swapVideo(largeVideo, video.id.videoId);
         });
       });
     }
@@ -107,7 +113,7 @@
       largeVideo.src = `https://www.youtube.com/embed/${videoId}`;
     }
 
-    // Fetch videos when the page loads
+    // Fetch and display videos when the page loads
     window.onload = fetchAndDisplayVideos;
   </script>
 </body>
