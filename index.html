@@ -3,57 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Video Display</title>
   <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    }
-
+    /* Styling for the main video display */
     #large-video {
-      width: 80%;
+      width: 100%;
       max-width: 800px;
       aspect-ratio: 16 / 9;
+      margin: 0 auto;
+      display: block;
       margin-bottom: 20px;
-      border: 2px solid #333;
-      border-radius: 8px;
     }
 
+    /* Styling for the thumbnails */
     #video-thumbnails {
       display: flex;
       overflow-x: auto;
-      gap: 15px;
-      width: 80%;
-      max-width: 800px;
-      padding-bottom: 10px;
+      gap: 10px;
+      padding: 10px;
     }
 
     .thumbnail {
-      flex: 0 0 150px;
+      flex: 0 0 auto;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      border: 2px solid transparent;
+      transition: border 0.3s ease;
     }
 
     .thumbnail img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      width: 150px;
+      height: auto;
+      object-fit: cover;
     }
 
     .thumbnail:hover {
-      transform: scale(1.05);
+      border: 2px solid blue;
     }
   </style>
 </head>
 <body>
-  <!-- Large video container -->
-  <iframe id="large-video" allowfullscreen></iframe>
+  <!-- Container for the large video -->
+  <iframe id="large-video" src="" frameborder="0" allowfullscreen></iframe>
 
-  <!-- Thumbnails container -->
+  <!-- Container for the scrolling thumbnails -->
   <div id="video-thumbnails"></div>
 
   <script>
@@ -93,20 +85,28 @@
 
       // Create thumbnails for the other videos
       videos.forEach((video, index) => {
+        const videoId = video.id?.videoId; // Safely access videoId
+        const thumbnailUrl = video.snippet?.thumbnails?.medium?.url || ''; // Provide a fallback
+
+        if (!videoId) {
+          console.warn('Skipping video without valid ID:', video);
+          return; // Skip videos without a valid ID
+        }
+
         const thumbnail = document.createElement('div');
         thumbnail.classList.add('thumbnail');
-        thumbnail.dataset.videoId = video.id.videoId;
+        thumbnail.dataset.videoId = videoId;
 
         const img = document.createElement('img');
-        img.src = video.snippet.thumbnails.medium.url;
-        img.alt = video.snippet.title;
+        img.src = thumbnailUrl;
+        img.alt = video.snippet?.title || 'Video thumbnail'; // Fallback alt text
 
         thumbnail.appendChild(img);
         thumbnailsContainer.appendChild(thumbnail);
 
         // Add click event listener to swap videos
         thumbnail.addEventListener('click', () => {
-          setLargeVideo(video.id.videoId);
+          setLargeVideo(videoId);
         });
 
         // Add a slight border for the first thumbnail to indicate it’s selected
