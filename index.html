@@ -5,48 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YouTube Video Display</title>
   <style>
-    /* Styling for the main video display */
-    #large-video {
-      width: 100%;
-      max-width: 800px;
-      aspect-ratio: 16 / 9;
-      margin: 0 auto;
-      display: block;
-      margin-bottom: 20px;
+    /* Main container for the layout */
+    #video-container {
+      display: flex;
+      flex-direction: row; /* Align items in a row */
+      justify-content: space-between; /* Space between large video and thumbnails */
+      align-items: flex-start; /* Align items to the top */
+      max-width: 1200px; /* Set a max width for larger screens */
+      margin: 0 auto; /* Center the container */
     }
 
-    /* Styling for the thumbnails */
+    /* Styling for the main video display */
+    #large-video {
+      width: 100%; /* Full width of available space */
+      max-width: 800px; /* Max width for large video */
+      aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+      margin-right: 20px; /* Space between video and thumbnails */
+    }
+
+    /* Styling for the thumbnails container */
     #video-thumbnails {
       display: flex;
-      overflow-x: auto;
-      gap: 10px;
-      padding: 10px;
+      flex-direction: column; /* Stack thumbnails vertically */
+      overflow-y: auto; /* Allow vertical scrolling */
+      gap: 10px; /* Space between thumbnails */
+      max-height: 500px; /* Limit height for better usability */
+      width: 200px; /* Fixed width for thumbnails container */
     }
 
     .thumbnail {
-      flex: 0 0 auto;
       cursor: pointer;
       border: 2px solid transparent;
       transition: border 0.3s ease;
     }
 
     .thumbnail img {
-      width: 150px;
-      height: auto;
+      width: 100%; /* Make images responsive */
+      height: auto; /* Maintain aspect ratio */
       object-fit: cover;
     }
 
     .thumbnail:hover {
-      border: 2px solid blue;
+      border: 2px solid blue; /* Highlight on hover */
     }
   </style>
 </head>
 <body>
-  <!-- Container for the large video -->
-  <iframe id="large-video" src="" frameborder="0" allowfullscreen></iframe>
+  <!-- Container for the video display -->
+  <div id="video-container">
+    <iframe id="large-video" src="" frameborder="0" allowfullscreen></iframe>
 
-  <!-- Container for the scrolling thumbnails -->
-  <div id="video-thumbnails"></div>
+    <!-- Container for the scrolling thumbnails -->
+    <div id="video-thumbnails"></div>
+  </div>
 
   <script>
     // Replace with your Cloud Function URL
