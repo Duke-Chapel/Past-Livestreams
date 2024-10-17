@@ -8,13 +8,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      background-color: #f4f4f4;
       margin: 0;
       padding: 20px;
-      background-color: #f4f4f4;
     }
 
     #large-video {
       width: 80%;
+      max-width: 800px;
       aspect-ratio: 16 / 9;
       margin-bottom: 20px;
       border: 2px solid #333;
@@ -26,11 +27,12 @@
       overflow-x: auto;
       gap: 15px;
       width: 80%;
+      max-width: 800px;
       padding-bottom: 10px;
     }
 
     .thumbnail {
-      flex: 0 0 200px;
+      flex: 0 0 150px;
       cursor: pointer;
       transition: transform 0.2s ease;
     }
@@ -55,6 +57,7 @@
   <div id="video-thumbnails"></div>
 
   <script>
+    // Replace with your Cloud Function URL
     const apiUrl = 'https://us-east1-embed-youtube-livestream-app.cloudfunctions.net/fetchPastLiveStreams';
 
     // Fetch videos from the backend
@@ -63,7 +66,7 @@
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
+          mode: 'cors', // Enable cross-origin requests
         });
 
         if (!response.ok) throw new Error('Network response was not ok');
@@ -85,17 +88,17 @@
         return;
       }
 
-      // Display the most recent video in the large container by default
-      largeVideo.src = `https://www.youtube.com/embed/${videos[0].id.videoId}`;
+      // Display the most recent video in the large container
+      setLargeVideo(videos[0].id.videoId);
 
-      // Create thumbnails for the remaining videos
-      videos.slice(1).forEach((video) => {
+      // Create thumbnails for the other videos
+      videos.forEach((video, index) => {
         const thumbnail = document.createElement('div');
         thumbnail.classList.add('thumbnail');
-        thumbnail.dataset.videoId = video.id.videoId;  // Store video ID in dataset
+        thumbnail.dataset.videoId = video.id.videoId;
 
         const img = document.createElement('img');
-        img.src = video.snippet.thumbnails.medium.url;  // Use thumbnail image
+        img.src = video.snippet.thumbnails.medium.url;
         img.alt = video.snippet.title;
 
         thumbnail.appendChild(img);
@@ -103,14 +106,20 @@
 
         // Add click event listener to swap videos
         thumbnail.addEventListener('click', () => {
-          swapVideo(largeVideo, video.id.videoId);
+          setLargeVideo(video.id.videoId);
         });
+
+        // Add a slight border for the first thumbnail to indicate it’s selected
+        if (index === 0) {
+          thumbnail.style.border = '2px solid blue';
+        }
       });
     }
 
-    // Swap the large video with the selected one
-    function swapVideo(largeVideo, videoId) {
-      largeVideo.src = `https://www.youtube.com/embed/${videoId}`;
+    // Function to set the large video
+    function setLargeVideo(videoId) {
+      const largeVideo = document.getElementById('large-video');
+      largeVideo.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
     }
 
     // Fetch and display videos when the page loads
