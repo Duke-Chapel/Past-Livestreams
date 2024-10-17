@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Video Display</title>
   <style>
     /* Main container for the layout */
     #video-container {
@@ -19,7 +20,7 @@
       width: 100%; /* Full width of available space */
       max-width: 800px; /* Max width for large video */
       aspect-ratio: 16 / 9; /* Maintain aspect ratio */
-      margin-right: 20px; /* Space between video and thumbnails */
+      margin-right: 10px; /* Decrease space between video and thumbnails */
     }
 
     /* Styling for the thumbnails container */
@@ -93,8 +94,8 @@
       // Display the most recent video in the large container
       setLargeVideo(videos[0].id.videoId);
 
-      // Create thumbnails for the other videos
-      videos.forEach((video, index) => {
+      // Create thumbnails for the other videos (skip the first one)
+      videos.slice(1).forEach((video, index) => {
         const videoId = video.id?.videoId; // Safely access videoId
         const thumbnailUrl = video.snippet?.thumbnails?.medium?.url || ''; // Provide a fallback
 
