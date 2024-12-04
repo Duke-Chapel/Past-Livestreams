@@ -1,147 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* Main container for the layout */
-    #video-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin: 0 auto;
-      max-width: 2400px;
-    }
+function displayVideos(videos) {
+  const largeVideo = document.getElementById('large-video');
+  const thumbnailsContainer = document.getElementById('video-thumbnails');
 
-    /* Styling for the main video display */
-    #large-video {
-      width: 100%;
-      margin-right: 10px;
-      aspect-ratio: 16 / 9;
-      height: auto;
-    }
+  if (videos.length === 0) {
+    console.error('No videos found.');
+    return;
+  }
 
-    /* Styling for the thumbnails container */
-    #video-thumbnails {
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      gap: 10px;
-      width: 600px;
-    }
+  // Set first video as default
+  setLargeVideo(videos[0].id);
 
-    .thumbnail {
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border 0.3s ease;
-    }
+  videos.forEach((video, index) => {
+    const videoId = video.id;
+    const thumbnailUrl = video.thumbnail;
+    const title = video.title;
 
-    .thumbnail img {
-      width: 100%;
-      height: auto;
-      object-fit: cover;
-    }
+    const thumbnail = document.createElement('div');
+    thumbnail.classList.add('thumbnail');
+    thumbnail.dataset.videoId = videoId;
 
-    .thumbnail.active {
-      border: 2px solid blue;
-    }
-  </style>
-</head>
-<body>
-  <div id="video-container">
-    <iframe id="large-video" src="" frameborder="0" allowfullscreen></iframe>
-    <div id="video-thumbnails"></div>
-  </div>
+    const img = document.createElement('img');
+    img.src = thumbnailUrl;
+    img.alt = title;
 
-  <script>
-    const apiUrl = 'https://us-east1-embed-youtube-livestream-app.cloudfunctions.net/fetchPastLiveStreams';
+    // Add title below thumbnail
+    const titleDiv = document.createElement('div');
+    titleDiv.textContent = title;
+    titleDiv.style.padding = '5px';
+    titleDiv.style.fontSize = '14px';
 
-    // Fetch videos from the backend
-    async function fetchAndDisplayVideos() {
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
-        });
+    thumbnail.appendChild(img);
+    thumbnail.appendChild(titleDiv);
+    thumbnailsContainer.appendChild(thumbnail);
 
-        if (!response.ok) throw new Error('Network response was not ok');
-        const videos = await response.json();
+    thumbnail.addEventListener('click', () => {
+      setLargeVideo(videoId);
+      document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+      thumbnail.classList.add('active');
+    });
 
-        // Sort videos from most recent to least recent by publish date
-        videos.sort((a, b) => new Date(b.snippet.publishedAt) - new Date(a.snippet.publishedAt));
-        displayVideos(videos);
-      } catch (error) {
-        console.error('Error fetching videos:', error);
-      }
-    }
+    if (index === 0) thumbnail.classList.add('active');
+  });
 
-    function displayVideos(videos) {
-      const largeVideo = document.getElementById('large-video');
-      const thumbnailsContainer = document.getElementById('video-thumbnails');
-
-      if (videos.length === 0) {
-        console.error('No videos found.');
-        return;
-      }
-
-      // Set the first video as the large video by default
-      setLargeVideo(videos[0].id.videoId);
-
-      // Create thumbnails for all videos (including the most recent one)
-      videos.forEach((video, index) => {
-        const videoId = video.id?.videoId;
-        const thumbnailUrl = video.snippet?.thumbnails?.medium?.url || '';
-
-        if (!videoId) {
-          console.warn('Skipping video without valid ID:', video);
-          return;
-        }
-
-        const thumbnail = document.createElement('div');
-        thumbnail.classList.add('thumbnail');
-        thumbnail.dataset.videoId = videoId;
-
-        const img = document.createElement('img');
-        img.src = thumbnailUrl;
-        img.alt = video.snippet?.title || 'Video thumbnail';
-
-        thumbnail.appendChild(img);
-        thumbnailsContainer.appendChild(thumbnail);
-
-        // Add click event to set the large video
-        thumbnail.addEventListener('click', () => {
-          setLargeVideo(videoId);
-
-          // Highlight the active thumbnail
-          document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-          thumbnail.classList.add('active');
-        });
-
-        // Highlight the first thumbnail as active by default
-        if (index === 0) thumbnail.classList.add('active');
-      });
-
-      adjustThumbnailsHeight();
-    }
-
-    function setLargeVideo(videoId) {
-      const largeVideo = document.getElementById('large-video');
-      largeVideo.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-
-      adjustThumbnailsHeight();
-    }
-
-    function adjustThumbnailsHeight() {
-      const largeVideo = document.getElementById('large-video');
-      const thumbnailsContainer = document.getElementById('video-thumbnails');
-      const videoHeight = largeVideo.clientHeight;
-
-      thumbnailsContainer.style.maxHeight = `${videoHeight}px`;
-    }
-
-    window.onload = fetchAndDisplayVideos;
-  </script>
-</body>
-</html>
+  adjustThumbnailsHeight();
+}
