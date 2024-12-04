@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Duke Chapel Livestreams</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+
     body {
       margin: 0;
       padding: 0;
@@ -33,6 +35,15 @@
       border-radius: 8px;
     }
 
+    .video-info {
+      margin: 1.5rem 0;
+    }
+
+    .thumbnail-title, .video-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+    }
+
     #video-thumbnails {
       width: 300px;
       display: flex;
@@ -54,22 +65,6 @@
     .thumbnail img {
       width: 100%;
       height: auto;
-      border-radius: 4px;
-    }
-
-    .video-card {
-      width: 100%;
-      background: white;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      box-sizing: border-box;
-    }
-
-    .video-card iframe {
-      width: 100%;
-      aspect-ratio: 16/9;
-      border: none;
       border-radius: 4px;
     }
 
@@ -99,19 +94,6 @@
         padding: 0.5rem;
       }
     }
-
-    /* Status styles */
-    .loading, .error {
-      padding: 1rem;
-      text-align: center;
-      background: white;
-      border-radius: 8px;
-      margin: 1rem 0;
-    }
-
-    .error {
-      color: #dc3545;
-    }
   </style>
 </head>
 <body>
@@ -139,14 +121,6 @@
       }
     }
 
-    function formatDate(dateString) {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      });
-    }
-
     function displayVideos(videos) {
       const largeVideo = document.getElementById('large-video');
       const thumbnailsContainer = document.getElementById('video-thumbnails');
@@ -167,7 +141,6 @@
         thumbnail.innerHTML = `
           <img src="${video.thumbnail}" alt="${video.title}">
           <div class="thumbnail-title">${video.title}</div>
-          <div class="thumbnail-date">${formatDate(video.publishedAt)}</div>
         `;
 
         thumbnail.addEventListener('click', () => {
